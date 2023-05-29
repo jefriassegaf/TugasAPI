@@ -1,0 +1,63 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+app.use(bodyParser.json());
+
+// Data produk sementara
+let products = [
+  { id: 1, name: 'Produk 1', price: 10 },
+  { id: 2, name: 'Produk 2', price: 20 },
+  { id: 3, name: 'Produk 3', price: 30 }
+];
+
+// Mengambil daftar produk
+app.get('/api/products', (req, res) => {
+  res.json(products);
+});
+
+// Menambahkan produk baru
+app.post('/api/products', (req, res) => {
+  const newProduct = req.body;
+  products.push(newProduct);
+  res.status(201).json(newProduct);
+});
+
+// Mengambil detail produk berdasarkan ID
+app.get('/api/products/:id', (req, res) => {
+  const productId = Number(req.params.id);
+  const product = products.find(prod => prod.id === productId);
+
+  if (product) {
+    res.json(product);
+  } else {
+    res.status(404).json({ error: 'Produk tidak ditemukan' });
+  }
+});
+
+// Menghapus produk berdasarkan ID
+app.delete('/api/products/:id', (req, res) => {
+  const productId = Number(req.params.id);
+  products = products.filter(prod => prod.id !== productId);
+  res.sendStatus(204);
+});
+
+// Mengupdate produk berdasarkan ID
+app.put('/api/products/:id', (req, res) => {
+  const productId = Number(req.params.id);
+  const updatedProduct = req.body;
+
+  products = products.map(prod => {
+    if (prod.id === productId) {
+      return { ...prod, ...updatedProduct };
+    }
+    return prod;
+  });
+
+  res.json(updatedProduct);
+});
+
+// Menjalankan server pada port 3000
+app.listen(3000, () => {
+  console.log('Server berjalan pada port 3000');
+});
